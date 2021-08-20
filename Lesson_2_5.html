@@ -1,0 +1,31 @@
+<meta charset="utf-8">
+<script type="text/javascript">
+	"use strict";
+	/*5. Реализовать основные 4 арифметические операции в виде функций с двумя параметрами. Обязательно использовать оператор return.*/
+
+	function amount_numbers(c,d) {
+		return c + d;
+	}
+
+	function product_numbers(c,d) {
+		return c * d;
+	}
+
+	function number_difference(c,d) {
+		return c - d;
+	}
+
+	function quotient_of_numbers(c,d) {
+		if (d === 0) {
+			console.log("На ноль делить нельзя");
+			return NaN;} 
+			else {return c / d;}
+	}
+
+console.log("Сумма чисел: " + amount_numbers(3,8));
+console.log("Произведение чисел: " + product_numbers(3,8));
+console.log("Разница чисел: " + number_difference(3,8));
+console.log("Частное чисел: " + quotient_of_numbers(3,0));
+	
+
+</script>
