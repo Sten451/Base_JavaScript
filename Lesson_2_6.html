@@ -1,0 +1,49 @@
+<meta charset="utf-8">
+<script type="text/javascript">
+	"use strict";
+	/*6. Реализовать функцию с тремя параметрами: function mathOperation(arg1, arg2, operation), где arg1, arg2 – значения аргументов, operation – строка с названием операции. В зависимости от переданного значения операции выполнить одну из арифметических операций (использовать функции из пункта 5) и вернуть полученное значение (использовать switch).*/
+
+	function mathOperation(arg1, arg2, operation) {
+		switch(operation) {
+			case "+":
+			return amount_numbers(arg1, arg2); 
+			break;
+			case "-":
+			return number_difference(arg1, arg2); 
+			break;
+			case "*":
+			return product_numbers(arg1, arg2); 
+			break;
+			case "/":
+			return quotient_of_numbers(arg1, arg2); 
+			break;
+			default:
+			console.log("Данная операция не допустима");
+			return NaN;
+			break;
+		}
+	}
+
+
+	function amount_numbers(c,d) {
+		return c + d;
+	}
+
+	function product_numbers(c,d) {
+		return c * d;
+	}
+
+	function number_difference(c,d) {
+		return c - d;
+	}
+
+	function quotient_of_numbers(c,d) {
+		if (d === 0) {
+			console.log("На ноль делить нельзя");
+			return NaN;} 
+			else {return c / d;}
+	}
+
+console.log(mathOperation(10,0,"/"));
+
+</script>
