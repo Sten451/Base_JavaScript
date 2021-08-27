@@ -1,0 +1,32 @@
+<meta charset="utf-8">
+<script type="text/javascript">
+	"use strict";
+	/*2.Продолжить работу с интернет-магазином:
+2.1. В прошлом домашнем задании вы реализовали корзину на базе массивов. Какими объектами можно заменить их элементы?
+2.2. Реализуйте такие объекты.
+2.3. Перенести функционал подсчета корзины на объектно-ориентированную базу.*/
+	class Basket {
+		static total = 0;
+			constructor(name, amount, price) {
+			this.name = name;
+			this.amount = amount;
+			this.price = price;
+		}
+		sum_amount() {
+			return this.amount * this.price
+		}
+
+		static compare(A, B) { 
+			Basket.total += A.amount + B.amount;
+			return Basket.total;
+		}  
+
+
+	}
+let B = [new Basket("Samsung", 4, 15000), new Basket("Xiomi", 2, 24500)];
+
+console.log(B.sort(Basket.compare))
+
+
+
+</script>
