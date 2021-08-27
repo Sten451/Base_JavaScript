@@ -8,7 +8,7 @@ b) Организовать функцию countBasketPrice, которая бу
 	function countBasketPrice(basket) {
 		let total = 0;
 		for (var i in basket) {
-			total = total + basket[i][1] * basket[i][2]  
+			total += basket[i][1] * basket[i][2]  
 		}
 		return total;
 		// Не смог с кодом ниже.
