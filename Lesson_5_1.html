@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+	<script type="text/javascript">
+	"use strict";
+	/*1. Создать функцию, генерирующую шахматную доску. При этом можно использовать любые html-теги по своему желанию. Доска должна быть разлинована соответствующим образом, т.е. чередовать черные и белые ячейки. Строки должны нумероваться числами от 1 до 8, столбцы – латинскими буквами A, B, C, D, E, F, G, H. (использовать createElement / appendChild)*/
+
+window.onload = function() {	
+
+	function chessboard() {
+		var wrapper = document.createElement("div");
+		wrapper.className = "wrapper";
+		wrapper.style.width = "500px";
+		wrapper.style.height = "500px";
+		wrapper.style.color = "blue";
+		wrapper.style.textAlign = "center";
+		wrapper.innerHTML = "<h1>Шахматная доска</h1>";
+		document.body.appendChild(wrapper);		
+
+		//рисуем
+		for (var j = 11; j > 1; j--) {
+			for (var i = 1; i < 11; i++) {
+				var ceil = document.createElement("div");
+				//проверяем последний цвет 
+				if (i > 1 && color === "white") {ceil.style.backgroundColor = "black"; var color = "black"}
+				else {ceil.style.backgroundColor = "white"; var color = "white"};
+				if (i === 1 || i === 10 || j === 2 || j === 11){
+					ceil.style.backgroundColor = "white";
+	
+					if (j === 11 && (i > 1 && i < 10)) {ceil.innerHTML = String.fromCharCode(63 + i); ceil.style.transform = "scale(-1, -1)"};
+					if (j === 2 && (i > 1 && i < 10)) {ceil.innerHTML = String.fromCharCode(63 + i)};
+					if (i === 1 && (j > 2 && j < 11)) {ceil.innerHTML = j - 2};
+					if (i === 10 && (j > 2 && j < 11)) {ceil.innerHTML = j - 2; ceil.style.transform = "scale(-1, -1)"};
+						
+				}//устанвливаем белый цвет на четные строки начального элемента
+				else if (j % 2 === 0 && i === 2) 
+					{ceil.style.backgroundColor = "white"; var color = "white"}
+								
+				ceil.style.width = "50px";
+				ceil.style.height = "50px";
+				ceil.style.float = "left";
+				ceil.style.outline = "1px solid black";
+				ceil.style.lineHeight = "50px";
+	
+				wrapper.appendChild(ceil);
+
+			}
+
+		}//конец цикла
+	
+	}// конец функции
+
+chessboard();
+
+};
+</script>
+   <title>Lesson 5_1</title>
+</head>
+<body>
+   
+</body>
+</html>
+
