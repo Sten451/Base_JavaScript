@@ -13,9 +13,17 @@
 
 window.onload = function() {	
 
+let Basket = {}
+
+/*
+let Basket = {
+   product1: {idx: "123", name: "Samsung m51", amount: 4, price: 13000},
+   product2: {idx: "234", name: "Xiomi mi10", amount: 15, price: 20000}
+};
+*/
 
 let Product = {
-   product1: {idx: "123", name: "Samsung m51", amount: 4, price: 15000, specifications: "cpu: 2000, память: 8 Гб"},
+   product1: {idx: "123", name: "Samsung m51", amount: 4, price: 13000, specifications: "cpu: 2000, память: 8 Гб"},
    product2: {idx: "234", name: "Xiomi mi10", amount: 15, price: 20000, specifications: "cpu: 1800, память: 6 Гб"},
    product3: {idx: "456", name: "Honor c6", amount: 6, price: 10000, specifications: "cpu: 1000, память: 4 Гб"},
    product4: {idx: "389", name: "Apple x12", amount: 2, price: 75000, specifications: "cpu: 3000, память: 16 Гб"},
@@ -24,29 +32,38 @@ let Product = {
       for (var id in Product) {
             if (id == "show_product"){break;}
             else {
-            Product.draw_all_product(this[id].idx, this[id].name, this[id].amount, this[id].price, this[id].specifications)}
+            this.draw_all_product(this[id].idx, this[id].name, this[id].amount, this[id].price, this[id].specifications)}
       }
+   },
+
+   Basket,
+
+   total() {
+      var all_total = 0
+         for (var id in Basket) {
+            all_total += this[id].amount * this[id].price
+            }        
+      return all_total;
    },
 
    show_basket(){
       // корзина
-      var element = Product.my_createElement("basket", "auto", "auto");
-      element.innerHTML = "<a href=''>В корзине 0 товаров на сумму 0 рублей.</a>";
+      var element = this.my_createElement("basket", "auto", "auto");
+      // смотрим длину корзины
+      const symbolsLength = Object.getOwnPropertySymbols(this.Basket);
+      const withoutSymbolLength = Object.keys(this.Basket);
+      if (symbolsLength + withoutSymbolLength) {
+         var bas = [];
+         for (var i in Basket) {
+            bas.push(["Товар: " + this[i].name, "Количество: " + this[i].amount, "Цена: " + this[i].price, "Общая сумма: " + this[i].amount * this[i].price + " рублей.<br>"])}
+             
+         element.innerHTML = "<p class = 'wrapper2'>" + bas + "</p><p>В корзине " + Object.keys(this.Basket).length +" товаров на сумму "+ this.total() +" рублей.</p><div class='button-container2'><a class='remove_cart' href='' title='Очистить корзину''>Очистить корзину</a></div>"; 
+
+      }
+      else {element.innerHTML = "<p>Корзина пуста</p>"};
       document.body.appendChild(element);       
 
    },
-
-   total() {
-      var all_total = 0
-         for (var product in Basket) {
-            if (product == "total"){break;}
-            else {            
-            all_total += this[product].amount * this[product].price
-            }        
-         }
-      return all_total;
-   },
-
 
 my_createElement(my_class, width, height) {
       var element = document.createElement("div");
@@ -54,27 +71,25 @@ my_createElement(my_class, width, height) {
       element.style.width = width;
       element.style.height = height;
       return element
-       
 },
-
 
 draw_all_product(idx, name, amount, price, specifications){
 
 //wrapper
-var element = Product.my_createElement("wrapper", "775px", "auto");
+var element = this.my_createElement("wrapper", "775px", "auto");
 document.body.appendChild(element);  
 
 //content
-var element = Product.my_createElement("content", "775px", "auto");
+var element = this.my_createElement("content", "775px", "auto");
 element.style.background = "none repeat scroll 0 0 #F6F6F6";
 element.style.border = "1px solid #D2D2D2";
 element.style.borderRadius = "5px 5px 5px 5px";
 element.style.margin = "0";
 element.style.padding = "0 10px 10px 10px";
-document.getElementsByClassName("wrapper")[0].appendChild(element);  
+document.querySelector(".wrapper:last-child").appendChild(element);  
 
 //top
-var element = Product.my_createElement("top", "770px", "auto");
+var element = this.my_createElement("top", "770px", "auto");
 element.style.background = "none repeat scroll 0 0 #FFFFFF";
 element.style.border = "1px solid #D2D2D2";
 element.style.borderBottom = "none";
@@ -84,15 +99,18 @@ element.style.padding = "0";
 element.style.position = "relative";
 element.style.top = "12px";
 element.innerHTML = "<div class='goods_header'><div class='goods_id'>" + idx + "</div><h1 id='goods_head'>" + name + "</h1></div>";
-document.getElementsByClassName("content")[0].appendChild(element);     
+var dim = document.getElementsByClassName("content")
+dim[dim.length - 1].appendChild(element);     
    
 //div.block.bblock-long.lot
-var element = Product.my_createElement("block bblock-long lot", "960px", "auto");
+var element = this.my_createElement("block bblock-long lot", "960px", "auto");
 element.innerHTML = "<div class='bcontent lot'><div class='block_img lot'><div><a class='img_full_size' href='' alt='' title=''></a></div><div class='big_preview'><a href=''><img class='big_preview' id='big_preview_1' src='' alt=''></a></div></div><div class='block-text'><p>" + specifications + "</p></div><div class='goods_price'><div class='action_block left'><div class='instock'>В наличии : " + amount + "</div></div><div class='price_block'><p>Цена: " + price + " руб.</p></div><div class='button-container'><a class='add_cart' href='' title='Добавить в корзину'>Добавить в корзину</a></div></div><div class='clear'></div></div><div class='clear'></div></div>";
-document.getElementsByClassName("content")[0].appendChild(element);         
+var dim = document.getElementsByClassName("content")
+dim[dim.length - 1].appendChild(element);  
 
-var element = Product.my_createElement("clear", "auto", "auto");
-document.getElementsByClassName("content")[0].appendChild(element);
+var element = this.my_createElement("clear", "auto", "auto");
+var dim = document.getElementsByClassName("content")
+dim[dim.length - 1].appendChild(element);  
 
 }
 
@@ -103,7 +121,7 @@ Product.show_basket();
 
 };
 </script>
-   <title>Lesson 5_1</title>
+   <title>Lesson 5_2</title>
    <style type="text/css">
    .goods_header {
     background: none repeat scroll 0 0 #F5F5F5;
@@ -168,7 +186,7 @@ h1 {
     clear: both;
 }
 
-div.big_preview {
+.big_preview {
     background: none repeat scroll 0 0 #FFFFFF;
     cursor: pointer;
     height: 100%;
@@ -195,7 +213,7 @@ div.big_preview {
 .lot .block-text {
     box-shadow: none;
     float: left;
-    font-size: 13px;
+    font-size: 16px;
     height: 59px;
     margin: 11px 0 0 11px;
     position: relative;
@@ -282,6 +300,28 @@ text-decoration: none;
 padding: 10px 10px 10px 10px;
 display: block;
 height: 100%
+}
+
+.remove_cart{
+background-color: blue;
+color: white;
+font-size: 20px;
+text-decoration: none;
+padding: 10px 10px 10px 10px;
+display: block;
+height: 100%
+text-align: center;
+}
+
+.wrapper2{
+   width: 770px;
+   font-size: 22px;
+
+}
+
+.button-container2{
+width: 300px;
+text-align: center;
 }
 
 
