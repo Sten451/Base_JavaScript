@@ -4,30 +4,29 @@
    <meta charset="utf-8">
 	<script type="text/javascript">
 	"use strict";
-	/*2. Сделать генерацию корзины динамической: верстка корзины не должна находиться в HTML-структуре. Там должен быть только div, в который будет вставляться корзина, сгенерированная на базе JS:
-2.1. Пустая корзина должна выводить строку «Корзина пуста»;
-2.2. Наполненная должна выводить «В корзине: n товаров на сумму m рублей».
-3*. Сделать так, чтобы товары в каталоге выводились при помощи JS:
-3.1. Создать массив товаров (сущность Product);
-3.2. При загрузке страницы на базе данного массива генерировать вывод из него. HTML-код должен содержать только div id=”catalog” без вложенного кода. Весь вид каталога генерируется JS.*/
+	/*1. Доработать модуль корзины.
+a. Добавлять в объект корзины выбранные товары по клику на кнопке «Купить» без перезагрузки страницы
+b. Привязать к событию покупки товара пересчет корзины и обновление ее внешнего вида*/
 
 window.onload = function() {	
-/*
+
+// Настройки
+let Settings = {
+   is_big: false,
+   is_list: 1
+}
+
+//Корзина пустая всегда сначала
 let Basket = {}
-*/
 
-let Basket = {
-   product_123: {idx: "123", name: "Samsung m51", amount: 4, price: 13000},
-   product_234: {idx: "234", name: "Xiomi mi10", amount: 15, price: 20000}
-};
-
-
+// Основной объект 
 let Product = {
    product_123: {idx: "123", name: "Samsung m51", amount: 4, price: 13000, specifications: "cpu: 2000, память: 8 Гб"},
    product_234: {idx: "234", name: "Xiomi mi10", amount: 15, price: 20000, specifications: "cpu: 1800, память: 6 Гб"},
    product_456: {idx: "456", name: "Honor c6", amount: 6, price: 10000, specifications: "cpu: 1000, память: 4 Гб"},
-   product_389: {idx: "389", name: "Apple x12", amount: 2, price: 75000, specifications: "cpu: 3000, память: 16 Гб"},
+   product_389: {idx: "389", name: "Apple x11", amount: 2, price: 75000, specifications: "cpu: 3000, память: 16 Гб"},
 
+   //Основная функция вывода каталога и корзины
    show_product(){
       for (var id in Product) {
             if (id == "show_product"){break;}
@@ -37,11 +36,13 @@ let Product = {
    },
 
    Basket,
+   Settings,
 
+   // Функция подсчета стоимости корзины
    total() {
       var all_total = 0
          for (var id in Basket) {
-            all_total += this[id].amount * this[id].price
+            all_total += this.Basket[id].amount * this.Basket[id].price
             }        
       return all_total;
    },
@@ -56,13 +57,13 @@ let Product = {
          var bas = [];
          
          for (var i in Basket) {
-            bas.push(["Товар: " + this[i].name, "Количество: " + this[i].amount, "Цена: " + this[i].price, "Общая сумма: " + this[i].amount * this[i].price + " рублей.<br>"])}
+            bas.push(["Товар: " + this.Basket[i].name, "Количество: " + this.Basket[i].amount, "Цена: " + this.Basket[i].price + " рублей.<br>"])
+         }
              
-         element.innerHTML = "<p class = 'wrapper2'>" + bas + "</p><p>В корзине " + Object.keys(this.Basket).length +" товаров на сумму "+ this.total() +" рублей.</p><div class='button-container2'><a id='clear_cart' class='remove_cart' href='#' title='Очистить корзину''>Очистить корзину</a></div>"; 
+         element.innerHTML = "<p class = 'wrapper2'>" + bas + "</p><p>В корзине " + Object.keys(this.Basket).length +" товаров на сумму "+ this.total() +" рублей.</p><div class='button-container2'><a id='clear_cart' class='remove_cart' href='' title='Очистить корзину''>Очистить корзину</a></div>"; 
             document.body.appendChild(element);
-            //Обработчик событий
             
-
+            //Обработчик событий
             var el = document.getElementById("clear_cart");
             el.addEventListener('click', () => {event.preventDefault(); this.clear_cart();});
       
@@ -75,27 +76,85 @@ let Product = {
 
    //очистка корзины
    clear_cart(){
-      alert("кнопка нажата");
-      //this.Basket = {};
-
+      //Если открыта большая картинка очистить корзину нельзя
+      if (this.Settings.is_big) {
+         return;
+      } 
+      document.body.removeChild(document.body.lastChild);
       for (const prop of Object.getOwnPropertyNames(this.Basket)) {
          delete this.Basket[prop];
-}
+      }  
       this.show_basket();
    },
 
 //добавление в корзину
-   add_cart(idx, name, amount, price){
-      //alert(name);
-      alert(idx + name + amount + price);
+   add_cart(idx, name, price){
+      // Если открыта большая картинка,запрет методов добавления в корзину по факту выход и функции 
+      if (this.Settings.is_big) {
+         return;
+      }   
 
-      //alert(this.Basket[product_+idx].name);
-      //alert("dfhdfh2");
-      //alert(this.Basket[product_+idx].name);
+      document.body.removeChild(document.body.lastChild);
+      // если такой товар есть, то увеличиваем его количество в корзине, иначе присваиваем ему 1.
+      if ("product_" + idx in this.Basket) {
+         
+         this.Basket["product_" + idx].amount += 1;
+         // Нельзя положить в корзину больше чем есть в наличии
+         if (this.Basket["product_" + idx].amount > this["product_" + idx].amount) {
+            this.Basket["product_" + idx].amount = this["product_" + idx].amount
+         }
+         
+      }// иначе заказываем один товар
+      else{var amount = 1;
+      Object.assign(this.Basket, {["product_" + idx]: {idx: idx, name: name, amount: amount, price: price}});   
+      };
+      
+      this.show_basket();
+   },
 
-      //product_123: {idx: "123", name: "Samsung m51", amount: 4, price: 13000
+   //большая картинка
+   img_full(idx){
+      //устанавливаем что открыта большая картинка
+      this.Settings.is_big = true;
+      if (document.getElementsByClassName("big_picture").length != 0){
+         document.body.removeChild(document.body.lastChild);
+      };
+      var element = this.my_createElement("big_picture", "auto", "auto");
+      element.style.background = "#f0f0f0";
+      element.style.border = "1px solid #D2D2D2";
+      element.style.position = "fixed";
+      element.style.top = "10%";
+      element.style.left = "30%";
+      element.innerHTML = "<a href ='' title = 'Нажмите для следующего изображения'><img id='img_b"+ idx +"' src='"+ idx +"/"+ this.Settings.is_list +".jpg' alt=''></a><div class = 'big_close'><a href =''>X</a></div>";
+      document.body.appendChild(element);
+             
+         // событие на закрытие большой картинки
+         var s2 = document.querySelector(".big_close");  
+         s2.addEventListener('click', () => {event.preventDefault(); this.close_b()});
 
-      //this.show_basket();
+         // событие на смену картинки
+         var el2 = document.getElementById("img_b" + idx);
+         if (el2.length != 0) {
+         el2.addEventListener('click', () => {event.preventDefault(); this.img_list(idx)});
+         };  
+   },
+
+   //не самая лучшая реализация конечно
+   img_list(idx){
+         this.Settings.is_list += 1;
+         //зацикливаем
+         if (this.Settings.is_list === 4) {
+            this.Settings.is_list = 1
+         }
+         this.img_full(idx);
+         
+   },
+
+   //функция закрытия большого изображения
+   close_b(){
+      document.body.removeChild(document.body.lastChild);
+      this.Settings.is_big = false;
+
    },
 
 
@@ -111,6 +170,7 @@ draw_all_product(idx, name, amount, price, specifications){
 
 //wrapper
 var element = this.my_createElement("wrapper", "775px", "auto");
+element.style.marginBottom = "10px";
 document.body.appendChild(element);  
 
 //content
@@ -138,14 +198,17 @@ dim[dim.length - 1].appendChild(element);
    
 //div.block.bblock-long.lot
 var element = this.my_createElement("block bblock-long lot", "960px", "auto");
-element.innerHTML = "<div class='bcontent lot'><div class='block_img lot'><div><a class='img_full_size' href='' alt='' title=''></a></div><div class='big_preview'><a href=''><img class='big_preview' id='big_preview_1' src='' alt=''></a></div></div><div class='block-text'><p>" + specifications + "</p></div><div class='goods_price'><div class='action_block left'><div class='instock'>В наличии : " + amount + "</div></div><div class='price_block'><p>Цена: " + price + " руб.</p></div><div class='button-container'><a id= 'product_"+idx+"' class='add_cart' href='' title='Добавить в корзину'>Добавить в корзину</a></div></div><div class='clear'></div></div><div class='clear'></div></div>";
+element.innerHTML = "<div class='bcontent lot'><div class='block_img lot'><div></div><div class='big_preview'><a id= 'img_"+idx+"' class='img_full_size' href='' alt='' title='Нажмите чтобы увеличить'><img class='big_preview' id='big_preview_1' src='"+ idx +"/1.jpg' alt=''></a></div></div><div class='block-text'><p>" + specifications + "</p></div><div class='goods_price'><div class='action_block left'><div class='instock'>В наличии : " + amount + "</div></div><div class='price_block'><p>Цена: " + price + " руб.</p></div><div class='button-container'><a id= 'product_"+idx+"' class='add_cart' href='' title='Добавить в корзину'>Добавить в корзину</a></div></div><div class='clear'></div></div><div class='clear'></div></div>";
 var dim = document.getElementsByClassName("content")
 dim[dim.length - 1].appendChild(element);
 
 //Обработчик событий
-var el = document.getElementById("product_"+idx+"");
-el.addEventListener('click', () => {this.add_cart(idx, name, amount, price)});  
-//
+var el = document.getElementById("product_"+idx);
+el.addEventListener('click', () => {event.preventDefault(); this.add_cart(idx, name, price)});
+//Обработчик событий изображений
+var el = document.getElementById("img_"+idx);
+el.addEventListener('click', () => {event.preventDefault(); this.img_full(idx)});
+
 var element = this.my_createElement("clear", "auto", "auto");
 var dim = document.getElementsByClassName("content")
 dim[dim.length - 1].appendChild(element);  
@@ -161,7 +224,8 @@ Product.show_basket();
 </script>
    <title>Lesson 6_1</title>
    <style type="text/css">
-   .goods_header {
+   
+    .goods_header {
     background: none repeat scroll 0 0 #F5F5F5;
     border: 1px solid #D2D2D2;
     border-radius: 5px 5px 5px 5px;
@@ -297,9 +361,10 @@ h1 {
 }
 
 .basket {
-   margin-top: 30px;
+   margin: 30px 0 30px 30px;
    font-size: 28px;
    text-align: left;
+   
 
 }
 
@@ -362,6 +427,39 @@ width: 300px;
 text-align: center;
 }
 
+.img_full_size{
+   position: block;
+
+}
+img .big_picture {
+   width: auto;
+   height: auto;
+};
+
+img {
+width: 100%;
+height: 100%;
+}
+
+.big_close {
+   
+   width: 40px;
+   height: 40px;
+   background-color: darkgrey;
+   position: absolute;
+   top: 0px;
+   right: 0px;
+   font-size: 28px;
+   text-align: center;
+   line-height: 40px;}
+
+ .big_close a {
+color: red;
+text-decoration: none;
+display: block;
+}
+
+}
 
    </style>
 </head>
