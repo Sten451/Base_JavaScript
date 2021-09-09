@@ -3,6 +3,15 @@
     padding: 0;
     background: #2e353d;
 }
+
+#Score {
+text-align: center;
+color: white;
+margin-top: 20px;
+font-size: 18px;
+
+}
+
 .menuButton{
     width: 150px;
     padding: 15px;
@@ -32,11 +41,28 @@ td.cell{
 .food{
     background: #00d021;
 }
+
+.obstacle{
+    background-color: darkred;
+}
+
+#legend {
+    margin: 10px 0 10px 0;
+    color: white;
+    text-align: center;
+    font-size: 28px;
+}
+
+#green {color: #00d021;}
+#red {color: red;}
+#blue {color: yellow;}
+
+
 .snakeBody{
     background: #e5e5e5;
 }
 .snakeHead{
-    background: #9b0013;
+    background-color: yellow;
 }
 .disabled {
     background: #7c7c7c;

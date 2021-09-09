@@ -4,13 +4,18 @@ const settings = {
     colsCount: 21,
     speed: 2,
     winFoodCount: 50,
-};
+    score: 0
+    };
 
 const config = {
     settings,
 
     init(userSettings) {
         Object.assign(this.settings, userSettings);
+    },
+
+    getScore() {
+        return this.settings.score;
     },
 
     getRowsCount() {
@@ -56,7 +61,39 @@ const config = {
         }
 
         return result;
+    }
+};
+
+const score ={
+    sc: null,
+// Очки
+    init(score){
+    var div = document.getElementById("Score");
+    var element = document.createElement("div");
+    element.className = "sc";
+    element.innerHTML = "<p>Очков: "+ score +"</p>";
+    div.appendChild(element)
     },
+
+    score_show(){
+        var d = document.getElementById("Score");
+        var d_nested = document.getElementsByClassName("sc");
+        d.removeChild(d_nested[0]);
+        this.init(this.sc); 
+
+    },
+
+    add_score(){
+        this.sc += 1;
+        this.score_show();
+    },
+
+    reset_score(){
+        this.sc = 0;
+        this.score_show();
+    }
+
+
 };
 
 const map = {
@@ -87,7 +124,7 @@ const map = {
         }
     },
 
-    render(snakePointsArray, foodPoint) {
+    render(snakePointsArray, foodPoint, obstaclePoint) {
         for (const cell of this.usedCells) {
             cell.className = 'cell';
         }
@@ -108,6 +145,16 @@ const map = {
         foodCell.classList.add('food');
 
         this.usedCells.push(foodCell);
+
+        // препятствие
+        const obstacleCellKey = `x${obstaclePoint.x}_y${obstaclePoint.y}`;
+        const obstacleCell = this.cells[obstacleCellKey];
+
+        obstacleCell.classList.add('obstacle');
+
+        this.usedCells.push(obstacleCell);
+
+
     },
 };
 
@@ -131,6 +178,31 @@ const food = {
         return this.x === point.x && this.y === point.y;
     },
 };
+
+//препятствия
+const obstacle = {
+    x: null,
+    y: null,
+
+    getCoordinates() {
+        return {
+            x: this.x,
+            y: this.y,
+        };
+    },
+
+    setCoordinates(point) {
+        this.x = point.x;
+        this.y = point.y;
+    },
+
+    isOnPoint(point) {
+        return this.x === point.x && this.y === point.y;
+    },
+
+
+}; 
+
 
 const snake = {
     body: [],
@@ -218,8 +290,10 @@ const status = {
 const game = {
     config,
     map,
+    score,
     snake,
     food,
+    obstacle,
     status,
     tickInterval: null,
 
@@ -234,6 +308,7 @@ const game = {
             return;
         }
 
+        this.score.init(this.config.getScore());
         this.map.init(this.config.getRowsCount(), this.config.getColsCount());
 
         this.setEventHandlers();
@@ -252,15 +327,19 @@ const game = {
         })
     },
 
+    //сброс ноывя игра
     reset() {
         this.stop();
         this.snake.init(this.getStartSnakeBody(), 'up');
         this.food.setCoordinates(this.getRandomFreeCoordinates());
+        this.obstacle.setCoordinates(this.getRandomFreeCoordinates());
+        this.score.reset_score();
         this.render();
     },
 
+    // рендеринг
     render() {
-        this.map.render(this.snake.body, this.food.getCoordinates());
+        this.map.render(this.snake.body, this.food.getCoordinates(), this.obstacle.getCoordinates());
     },
 
     getStartSnakeBody() {
@@ -273,7 +352,7 @@ const game = {
     },
 
     getRandomFreeCoordinates() {
-        const exclude = [this.food.getCoordinates(), ...this.snake.getBody()];
+        const exclude = [this.food.getCoordinates(), this.obstacle.getCoordinates(), ...this.snake.getBody()];
 
         while (true) {
             const rndPoint = {
@@ -360,11 +439,14 @@ const game = {
     },
 
     tickHandler() {
-        if (!this.canMakeStep()) return this.finish();
+        if (!this.canMakeStep() || this.obstacle.isOnPoint(this.snake.getNextHeadPoint())) return this.finish();
 
         if (this.food.isOnPoint(this.snake.getNextHeadPoint())) {
             this.snake.growUp();
+            this.score.add_score();
             this.food.setCoordinates(this.getRandomFreeCoordinates());
+            // если съесли то и препятствие меняем
+            this.obstacle.setCoordinates(this.getRandomFreeCoordinates());
 
             if (this.isGameWon()) this.finish();
         }
